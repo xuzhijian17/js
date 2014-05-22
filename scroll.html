@@ -1,0 +1,116 @@
+
+<html>
+<head>
+	<title></title>
+
+</head>
+<body>
+	<div id="box" style="border:1px solid black;">
+		<ul id="scrollbox">
+			<li id="scrollImg">
+				<ul>
+					<li><a href="#" target="_blank"><img src="images/1.jpg" /></a></li>
+					<li><a href="#" target="_blank"><img src="images/2.jpg" /></a></li>
+					<li><a href="#" target="_blank"><img src="images/3.jpg" /></a></li>
+					<li><a href="#" target="_blank"><img src="images/4.jpg" /></a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+<script type="text/javascript" src="jquery-1.7.2.js"></script>
+<script type="text/javascript">
+	
+	$(document).ready(function() {
+		/*
+		box的大小最好依据图片的大小和张数来决定，这样子不会出现显示不全或滚动停止的问题，比如：每张图片宽80，共4张，那么box的大小最后就是小于等于80*4=320的宽带。另为了防止滚动到最后一张出现停止的问题，如果box设置了margin,padding需再原来的基础上减去对应的大小.
+		
+		*/
+		var img_l = $('#scrollImg img').length;	//计算所有图片张数（总长度），不包括克隆图片
+		var img_w = 80;	//可以通过js获取图片宽度
+		var img_h = 60;
+		var box_w = 620;//img_w*img_l;	
+		var box_h = img_h;	//盒子高,如果是垂直的，修改这里
+		var speed = 30; //这里的速度是指0.03秒滚动条移动一个像素
+		var directionNan = true;	//设置水平或垂直滚动方向
+		
+		if(box_w > img_w*img_l){
+			//alert("因设置的box长度大于图片所有张数之和，如果运行会出现显示不全或滚动停止的问题");
+		}
+
+		$('#scrollbox').append('<li id="cloneScrollImg"><li>'); //添加图片克隆标签，实现无缝滚动的障眼法效果
+
+		$('#box').hover(
+			function(){
+				clearTimeout(run);
+			},
+			function(){
+				setTimeout("scrollImage("+directionNan+","+speed+")",speed);
+				alert(speed);
+			});
+		
+		directionNan ? horizontal(box_w,box_h,img_w,img_h,img_l,speed) : vertical(box_w,box_h,img_w,img_h,img_l,speed);	//如果要使append里的标签生效，这段代码必须先执行。
+
+		//鼠标经过原图片是的动作
+		$('#scrollImg li').hover(
+			function(){
+				
+			},
+			function(){
+				
+			});
+			
+		//鼠标经过克隆图片是的动作
+		$('#cloneScrollImg li').hover(
+			function(){
+				//alert($(this).html());
+			},
+			function(){
+				//alert($(this).find("a").html());
+			});
+	});
+
+	var run;	//因这里要用到全局函数，所以位置勿动
+	//水平滚动
+	function horizontal (box_w,box_h,img_w,img_h,img_l,speed) {
+		$('#box').css({'width': box_w,'height':box_h,'overflow':'hidden'}); 	
+		$('#scrollbox').width(img_w*img_l*2);
+		$('#scrollImg img').css({'width':img_w,'height':img_h,'border':'0'});
+		$('#box ul').css({'margin':'0','padding':'0'});
+		$('#box li').css({'list-style':'none','float':'left'});
+		$('#scrollImg>ul').clone().prependTo($('#cloneScrollImg'));
+		scrollImage(1,speed);
+	}
+	
+	//垂直滚动
+	function vertical (box_w,box_h,img_w,img_h,img_l,speed) {
+		$('#box').css({'width': box_w,'height':box_h,'overflow':'hidden'}); 
+		$('#scrollbox').height(img_h*img_l*2);
+		$('#scrollImg img').css({'width':img_w,'height':img_h,'border':'0'});
+		$('#box ul').css({'margin':'0','padding':'0'});
+		$('#box li').css({'list-style':'none'});
+		$('#scrollImg>ul').clone().prependTo($('#cloneScrollImg'));
+		scrollImage(0,speed);
+	}
+	
+	//递归滚动
+	function scrollImage (directionNan,speed) {
+		if (directionNan) {
+			//水平滚动
+			var left = $('#box').scrollLeft();
+	        left++;
+	        left = (left > $('#scrollImg').width() ? 0 : left);
+	        $('#box').scrollLeft(left);
+	        run = setTimeout("scrollImage(1,"+speed+")",speed);	//递归
+		}else{
+			//垂直滚动
+			var top = $('#box').scrollTop();
+	        top++;
+	        top = (top > $('#scrollImg').height() ? 0 : top);
+	        $('#box').scrollTop(top);
+	        run = setTimeout("scrollImage(0,"+speed+")",speed);
+		}
+	}
+	
+</script>
+</body>
+</html>
